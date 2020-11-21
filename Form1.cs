@@ -10,109 +10,149 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CodeGenerator.Template;
 using Dapper;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace CodeGenerator
 {
     public partial class Form1 : Form
     {
+        private static readonly string path = $"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\\Result\\";
+
         public Form1()
         {
             InitializeComponent();
+            button1.Enabled = false;
         }
 
-        private  void button1_ClickAsync(object sender, EventArgs e)
+        private void button1_ClickAsync(object sender, EventArgs e)
         {
-            Task.Run(() =>
+            // Task.Run(() =>
+            // {
+            try
             {
-                try
+                var tables = GetSelectedTableNames();
+
+                foreach (var table in tables)
                 {
-                    using IDbConnection conn = new MySqlConnection(connString.Text);
-                    var tableName = this.tableName.Text;
-                    string sql = $@"
-                                SELECT
-	                                `information_schema`.`COLUMNS`.`COLUMN_NAME`,
-	                                `information_schema`.`COLUMNS`.`DATA_TYPE`,
-	                                `information_schema`.`COLUMNS`.`COLUMN_COMMENT` 
-                                FROM
-	                                `information_schema`.`COLUMNS` 
-                                WHERE
-                                table_name = '{tableName}'
-                            ";
-                    var sql2 = $@"SELECT
-	                                information_schema.`TABLES`.TABLE_COMMENT 
-                                FROM
-	                                `information_schema`.`TABLES` 
-                                WHERE
-	                                table_name = '{tableName}'";
+                    var tableName = ReplaceString(table);
+                    //获取表结构信息
+                    var tableInfoList = DbHelper.DbHelper.GetInformationSchema(connString.Text, table);
+                    //替换表字段和表类型
+                    tableInfoList.ForEach(t => { t.ColumnName = ReplaceString(t.ColumnName); t.DataType = GetClrType(t.DataType); });
 
-                    var tableInfoList = new List<InformationSchema>();
-                    var reader = conn.ExecuteReader(sql);
+                    // todo 生成实体类模板
+                    var modelTemplate = ModelTemplate.Template(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
 
-                    while (reader.Read())
-                    {
-                        var tableInfo = new InformationSchema()
-                        {
-                            ColumnName = ReplaceString(reader["COLUMN_NAME"].ToString()),
-                            DataType = GetClrType(reader["DATA_TYPE"].ToString()),
-                            ColumnComment = reader["COLUMN_COMMENT"].ToString()
-                        };
-                        tableInfoList.Add(tableInfo);
-                    }
-                    reader.Close();
-                    reader.Dispose();
-                    var tableComment = conn.QueryFirstOrDefault<string>(sql2);
-                    var str = ClassTemplate(tableInfoList, tableName, tableComment);
-                    var path = $"{Directory.GetParent(Directory.GetCurrentDirectory()).Parent?.Parent}\\{ReplaceString(tableName)}\\Entity";
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-
-                    path = path + $"\\{ReplaceString(tableName)}.cs";
-                    FileStream fileStream = new FileStream(path, FileMode.Create);
-                    byte[] data = System.Text.Encoding.Default.GetBytes(str);
-                    fileStream.WriteAsync(data, 0, data.Length);
+                    SaveFiles($"Models\\", $"{tableName}.cs", modelTemplate);
                 }
-                catch (Exception exception)
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(@"代码生成失败," + exception.Message);
+                return;
+            }
+            MessageBox.Show(@"代码生成成功");
+            //  });
+        }
+
+        /// <summary>
+        /// 获取选中的表名
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<string> GetSelectedTableNames()
+        {
+            return tablesChecked.Items.Cast<object>().Where((t, i) => tablesChecked.GetItemChecked(i)).Select(t => tablesChecked.GetItemText(t)).ToList();
+        }
+
+        /// <summary>
+        /// 显示表名列表
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void connection_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                tablesChecked.Items.Clear();
+
+                var tables = DbHelper.DbHelper.GetTables(GetDbName(), connString.Text);
+
+                foreach (var table in tables)
                 {
-                    MessageBox.Show(@"代码生成失败,"+exception.Message);
+                    tablesChecked.Items.Add(table);
+                }
+
+                if (tablesChecked.Items.Any()) return;
+                MessageBox.Show(@"未查找到表,请检查数据库连接地址是否正确或包含空格");
+                return;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(@"数据库连接失败," + exception.Message);
+                return;
+            }
+        }
+
+        /// <summary>
+        /// 全选/取消全选
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Selected_Click(object sender, EventArgs e)
+        {
+            for (var i = 0; i < tablesChecked.Items.Count;)
+            {
+                if (tablesChecked.GetItemCheckState(i) == CheckState.Checked)
+                {
+                    for (var j = 0; j < tablesChecked.Items.Count; j++)
+                    {
+                        tablesChecked.SetItemCheckState(j, CheckState.Unchecked);
+                    }
+
+                    button1.Enabled = false;
                     return;
-                    
                 }
-                MessageBox.Show(@"代码生成成功");
-            });
-
+                else
+                {
+                    for (var j = 0; j < tablesChecked.Items.Count; j++)
+                    {
+                        tablesChecked.SetItemCheckState(j, CheckState.Checked);
+                    }
+                    button1.Enabled = true;
+                    return;
+                }
+            }
         }
 
-        private string ClassTemplate(List<InformationSchema> tableInfoList,string tableName,string tableComment)
+        /// <summary>
+        /// 获取数据库名称
+        /// </summary>
+        /// <returns></returns>
+        public string GetDbName()
         {
-            if (tableInfoList.Count<=0)
+            var startIndex = connString.Text.TrimStart().IndexOf("database=", StringComparison.Ordinal) + 9;
+            var endIndex = connString.Text.TrimStart().IndexOf(";", startIndex, StringComparison.Ordinal);
+            return connString.Text.Trim().Substring(startIndex, endIndex - startIndex).Trim();
+        }
+
+        /// <summary>
+        /// 保存文件到桌面
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="template"></param>
+        private void SaveFiles(string filePath, string fileName, string template)
+        {
+            if (!Directory.Exists(path + filePath))
             {
-                throw new Exception("找不到表的相关信息");
+                Directory.CreateDirectory(path + filePath);
             }
-            var sb = new StringBuilder();
-            var getSet = " { get; set; } ";
-            sb.AppendLine("using System;");
-            sb.AppendLine("using System.Text;\r\n");
-            sb.AppendLine($"namespace XX");
-            sb.AppendLine("    {\r\n");
-            sb.AppendLine($"            /// <summary>");
-            sb.AppendLine($"            ///  {tableComment} ");
-            sb.AppendLine($"            /// <summary>");
-            sb.AppendLine($"            public class {ReplaceString(tableName)}");
-            sb.AppendLine("            {");
-            foreach (var informationSchema in tableInfoList)
-            {
-                sb.AppendLine($"              /// <summary>");
-                sb.AppendLine($"              ///  {informationSchema.ColumnComment} ");
-                sb.AppendLine($"              /// <summary>");
-                sb.AppendLine($"              public  {informationSchema.DataType}  {informationSchema.ColumnName} {getSet}");
-                sb.AppendLine();
-            }
-            sb.AppendLine("            }");
-            sb.AppendLine("    }");
-            return sb.ToString();
+            var fileStream = new FileStream(path + filePath + fileName, FileMode.Create);
+            var data = System.Text.Encoding.Default.GetBytes(template);
+            fileStream.Write(data, 0, data.Length);
+            fileStream.Flush();
         }
 
         /// <summary>
@@ -130,25 +170,33 @@ namespace CodeGenerator
                 case "int":
                 case "integer":
                     return "int";
+
                 case "bigint":
                     return "long";
+
                 case "double":
                     return "double";
+
                 case "float":
                     return "float";
+
                 case "decimal":
                     return "decimal";
+
                 case "numeric":
                 case "real":
                     return "decimal";
+
                 case "bit":
                     return "bool";
+
                 case "date":
                 case "time":
                 case "year":
                 case "datetime":
                 case "timestamp":
                     return "DateTime";
+
                 case "tinyblob":
                 case "blob":
                 case "mediumblob":
@@ -156,6 +204,7 @@ namespace CodeGenerator
                 case "binary":
                 case "varbinary":
                     return "byte[]";
+
                 case "char":
                 case "varchar":
                 case "tinytext":
@@ -163,6 +212,7 @@ namespace CodeGenerator
                 case "mediumtext":
                 case "longtext":
                     return "string";
+
                 case "point":
                 case "linestring":
                 case "polygon":
@@ -183,12 +233,12 @@ namespace CodeGenerator
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        private string ReplaceString(string str)
+        private static string ReplaceString(string str)
         {
             var result = "";
-            if (!str.Contains("_")&&!Regex.IsMatch(str,"[A-Z]"))  //&& Regex.IsMatch(str, "[a-z]")
+            if (!str.Contains("_") && !Regex.IsMatch(str, "[A-Z]"))  //&& Regex.IsMatch(str, "[a-z]")
             {
-                result= str[0].ToString().ToUpper()+str.Substring(1);
+                result = str[0].ToString().ToUpper() + str.Substring(1);
             }
 
             if (str.Contains("_"))
@@ -198,6 +248,17 @@ namespace CodeGenerator
             }
 
             return result;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+        }
+
+
+        private void tablesChecked_SelectedValueChanged(object sender, EventArgs e)
+        {
+            var tableNames = GetSelectedTableNames();
+            button1.Enabled = tableNames.Any();
         }
     }
 }
