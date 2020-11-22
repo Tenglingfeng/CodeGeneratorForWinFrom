@@ -34,7 +34,9 @@ namespace CodeGenerator.DbHelper
                                 SELECT
 	                                `information_schema`.`COLUMNS`.`COLUMN_NAME`,
 	                                `information_schema`.`COLUMNS`.`DATA_TYPE`,
-	                                `information_schema`.`COLUMNS`.`COLUMN_COMMENT`
+	                                `information_schema`.`COLUMNS`.`COLUMN_COMMENT`,
+	                                `information_schema`.`COLUMNS`.`CHARACTER_MAXIMUM_LENGTH`,
+                                    `information_schema`.`COLUMNS`.IS_NULLABLE
                                 FROM
 	                                `information_schema`.`COLUMNS`
                                 WHERE
@@ -56,7 +58,9 @@ namespace CodeGenerator.DbHelper
                 {
                     ColumnName = (reader["COLUMN_NAME"].ToString()),
                     DataType = (reader["DATA_TYPE"].ToString()),
-                    ColumnComment = reader["COLUMN_COMMENT"].ToString()
+                    ColumnComment = reader["COLUMN_COMMENT"].ToString(),
+                    CharacterMaximumLength = (reader["CHARACTER_MAXIMUM_LENGTH"])?.ToString(),
+                    IsNullable = reader["IS_NULLABLE"]?.ToString() == "YES" ? true : false
                 };
                 tableInfoList.Add(tableInfo);
             }

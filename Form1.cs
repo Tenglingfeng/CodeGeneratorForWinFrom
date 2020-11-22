@@ -26,12 +26,19 @@ namespace CodeGenerator
             button1.Enabled = false;
         }
 
+        /// <summary>
+        /// 生成代码
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_ClickAsync(object sender, EventArgs e)
         {
             // Task.Run(() =>
             // {
             try
             {
+                EnableButton(false);
+
                 var tables = GetSelectedTableNames();
 
                 foreach (var table in tables)
@@ -40,21 +47,70 @@ namespace CodeGenerator
                     //获取表结构信息
                     var tableInfoList = DbHelper.DbHelper.GetInformationSchema(connString.Text, table);
                     //替换表字段和表类型
-                    tableInfoList.ForEach(t => { t.ColumnName = ReplaceString(t.ColumnName); t.DataType = GetClrType(t.DataType); });
+                    tableInfoList.ForEach(t => { t.ColumnName = ReplaceString(t.ColumnName); t.DataType = GetClrType(t.DataType, t.IsNullable); });
+
+                    // todo 生成CreateUpdateDto模板
+                    var createUpdateDtoTemplate = ContractTemplate.CreateUpdateDtoTemplate(tableInfoList, tableName,
+                        tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+
+                    // todo 生成Dto模板
+                    var dtoTemplate = ContractTemplate.DtoTemplate(tableInfoList, tableName,
+                        tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+
+                    // todo 生成pagedAndSortedResultRequestDto模板
+                    var pagedAndSortedResultRequestDtoTemplate = ContractTemplate.PagedAndSortedResultRequestDtoTemplate(tableName,
+                        tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+
+                    // todo 生成IManager模板
+                    var iManagerTemplate = DomainTemplate.IManagerTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+
+                    // todo 生成Manager模板
+                    var managerTemplate = DomainTemplate.ManagerTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+
+                    // todo 生成IRepository模板
+                    var iRepositoryTemplate = DomainTemplate.IRepositoryTemplate(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+
+                    // todo 生成Repository模板
+                    var repositoryTemplate = EntityFrameworkCoreTemplate.RepositoryTemplate(GetDbName(), tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
 
                     // todo 生成实体类模板
-                    var modelTemplate = ModelTemplate.Template(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+                    var entityTemplate = DomainTemplate.EntityTemplate(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
 
-                    SaveFiles($"Models\\", $"{tableName}.cs", modelTemplate);
+                    //保存Contracts文件
+                    SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"CreateUpdate{tableName}Dto.cs", createUpdateDtoTemplate);
+                    SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"{tableName}Dto.cs", dtoTemplate);
+                    SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"{tableName}PagedAndSortedResultRequestDto.cs", pagedAndSortedResultRequestDtoTemplate);
+
+                    //保存Domain文件
+                    SaveFiles($"Domain\\{tableName}s\\DomainService\\", $"I{tableName}Manager.cs", iManagerTemplate);
+                    SaveFiles($"Domain\\{tableName}s\\DomainService\\", $"{tableName}Manager.cs", managerTemplate);
+                    SaveFiles($"Domain\\{tableName}s\\Repository\\", $"I{tableName}Repository.cs", iRepositoryTemplate);
+                    SaveFiles($"Domain\\{tableName}s\\", $"{tableName}.cs", entityTemplate);
+
+                    //保存EntityFrameworkCore文件
+                    SaveFiles($"EntityFrameworkCore\\Repositories\\{tableName}s\\", $"{tableName}Repository.cs", repositoryTemplate);
                 }
             }
             catch (Exception exception)
             {
                 MessageBox.Show(@"代码生成失败," + exception.Message);
+                EnableButton(true);
                 return;
             }
             MessageBox.Show(@"代码生成成功");
+            EnableButton(true);
             //  });
+        }
+
+        /// <summary>
+        /// 禁用/启用所有的控件
+        /// </summary>
+        private void EnableButton(bool b)
+        {
+            foreach (Control control in this.Controls)
+            {
+                control.Enabled = b;
+            }
         }
 
         /// <summary>
@@ -159,43 +215,44 @@ namespace CodeGenerator
         /// 根据数据库类型获取字段类型
         /// </summary>
         /// <param name="dbType"></param>
+        /// <param name="isNullable"></param>
         /// <returns></returns>
-        private static string GetClrType(string dbType)
+        private static string GetClrType(string dbType, bool isNullable)
         {
+            string result = "";
             switch (dbType)
             {
                 case "tinyint":
                 case "smallint":
                 case "mediumint":
                 case "int":
-                case "integer":
-                    return "int";
+                case "integer": result = "int"; break;
 
                 case "bigint":
-                    return "long";
+                    result = "long"; break;
 
                 case "double":
-                    return "double";
+                    result = "double"; break;
 
                 case "float":
-                    return "float";
+                    result = "float"; break;
 
                 case "decimal":
-                    return "decimal";
+                    result = "decimal"; break;
 
                 case "numeric":
                 case "real":
-                    return "decimal";
+                    result = "decimal"; break;
 
                 case "bit":
-                    return "bool";
+                    result = "bool"; break;
 
                 case "date":
                 case "time":
                 case "year":
                 case "datetime":
                 case "timestamp":
-                    return "DateTime";
+                    result = "DateTime"; break;
 
                 case "tinyblob":
                 case "blob":
@@ -203,7 +260,7 @@ namespace CodeGenerator
                 case "longblog":
                 case "binary":
                 case "varbinary":
-                    return "byte[]";
+                    result = "byte[]"; break;
 
                 case "char":
                 case "varchar":
@@ -211,7 +268,7 @@ namespace CodeGenerator
                 case "text":
                 case "mediumtext":
                 case "longtext":
-                    return "string";
+                    result = "string"; break;
 
                 case "point":
                 case "linestring":
@@ -224,8 +281,15 @@ namespace CodeGenerator
                 case "enum":
                 case "set":
                 default:
-                    return dbType;
+                    result = dbType; break;
             }
+
+            if (!isNullable) return result;
+            if (!result.Equals("string"))
+            {
+                result = $"{result}?";
+            }
+            return result;
         }
 
         /// <summary>
@@ -254,7 +318,11 @@ namespace CodeGenerator
         {
         }
 
-
+        /// <summary>
+        /// 监测表列表选中事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tablesChecked_SelectedValueChanged(object sender, EventArgs e)
         {
             var tableNames = GetSelectedTableNames();
