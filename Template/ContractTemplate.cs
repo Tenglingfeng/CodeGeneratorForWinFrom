@@ -76,6 +76,7 @@ namespace CodeGenerator.Template
             var sb = new StringBuilder();
             var getSet = " { get; set; } ";
             sb.AppendLine("using System;");
+            sb.AppendLine("using System.ComponentModel.DataAnnotations;");
             sb.AppendLine("using System.Text;\r\n");
             sb.AppendLine($"namespace {tableName}.Dto");
             sb.AppendLine("    {\r\n");
@@ -128,7 +129,7 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 分页排序模型: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            sb.AppendLine($"            public class {tableName}Dto :PagedAndSortedResultRequestDto");
+            sb.AppendLine($"            public class {tableName}PagedAndSortedResultRequestDto :PagedAndSortedResultRequestDto");
             sb.AppendLine("            {\r\n");
             sb.AppendLine($"                public {tableName}PagedAndSortedResultRequestDto()");
             sb.AppendLine("                  {");
@@ -137,6 +138,32 @@ namespace CodeGenerator.Template
             sb.AppendLine($"                          Sorting = \"ReferenceNo Asc\";");
             sb.AppendLine("                       }");
             sb.AppendLine("                   }\r\n\r\n\r\n\r\n");
+            sb.AppendLine("            }");
+            sb.AppendLine("    }");
+            return sb.ToString();
+        }
+
+        ///  <summary>
+        /// IServiceTemplate模板
+        ///  </summary>
+        ///  <param name="tableName"></param>
+        ///  <param name="tableComment"></param>
+        ///  <param name="dataType"></param>
+        ///  <returns></returns>
+        public static string IServiceTemplate(string tableName, string tableComment, string dataType)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("using System;");
+            sb.AppendLine("using System.Text;\r\n");
+            sb.AppendLine($"using {tableName}.Dto;");
+            sb.AppendLine($"namespace {tableName}s");
+            sb.AppendLine("    {\r\n");
+            sb.AppendLine($"            /// <summary>");
+            sb.AppendLine($"            /// 应用服务契约接口: {tableComment} ");
+            sb.AppendLine($"            /// </summary>");
+            sb.AppendLine($"             public interface IOrderAppService : IBenchintCrudAppService<{tableName}Dto, {dataType}, {tableName}PagedAndSortedResultRequestDto, CreateUpdate{tableName}Dto, CreateUpdate{tableName}Dto>");
+            sb.AppendLine("            {\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
+
             sb.AppendLine("            }");
             sb.AppendLine("    }");
             return sb.ToString();

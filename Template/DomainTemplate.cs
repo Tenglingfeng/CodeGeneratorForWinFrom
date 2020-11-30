@@ -24,12 +24,12 @@ namespace CodeGenerator.Template
             var getSet = " { get; set; } ";
             sb.AppendLine("using System;");
             sb.AppendLine("using System.Text;\r\n");
-            sb.AppendLine($"namespace {tableName}");
+            sb.AppendLine($"namespace {tableName}s");
             sb.AppendLine("    {\r\n");
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 实体类信息: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            sb.AppendLine($"            public class {tableName} : :Entity<{tableInfoList.FirstOrDefault()?.DataType}>");
+            sb.AppendLine($"            public class {tableName} :Entity<{tableInfoList.FirstOrDefault()?.DataType}>");
             sb.AppendLine("            {");
             foreach (var informationSchema in tableInfoList.Skip(1))
             {
@@ -44,14 +44,17 @@ namespace CodeGenerator.Template
             return sb.ToString();
         }
 
-        /// <summary>
-        ///IManager模板
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="tableComment"></param>
-        /// <returns></returns>
-        public static string ManagerTemplate(string tableName, string tableComment)
+        ///  <summary>
+        /// Manager模板
+        ///  </summary>
+        ///  <param name="tableName"></param>
+        ///  <param name="tableComment"></param>
+        ///  <param name="projectName"></param>
+        ///  <returns></returns>
+        public static string ManagerTemplate(string tableName, string tableComment, string projectName)
         {
+            var first = tableName.Substring(0, 1).ToLower();
+            var end = tableName.Substring(1);
             var sb = new StringBuilder();
             sb.AppendLine($"using {tableName}.Repository;\r\n");
             sb.AppendLine("using System;\r\n");
@@ -60,12 +63,12 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 领域服务实现: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            sb.AppendLine($"            public class {tableName}Manager  : 项目名称DomainServerBase, I{tableName}Manager");
+            sb.AppendLine($"            public class {tableName}Manager  : {projectName}DomainServerBase, I{tableName}Manager");
             sb.AppendLine("            {\r\n");
-            sb.AppendLine($"                private readonly I{tableName}Repository _{tableName.ToLower()}Repository;\r\n\r\n");
+            sb.AppendLine($"                private readonly I{tableName}Repository _{first + end}Repository;\r\n\r\n");
             sb.AppendLine($"                public {tableName}Manager(I{tableName}Repository repository)");
             sb.AppendLine("                  {");
-            sb.AppendLine($"                       _{tableName.ToLower()}Repository = repository;");
+            sb.AppendLine($"                       _{first + end}Repository = repository;");
             sb.AppendLine("                  }\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
             sb.AppendLine("            }");
             sb.AppendLine("    }");
@@ -73,7 +76,7 @@ namespace CodeGenerator.Template
         }
 
         /// <summary>
-        ///Manager模板
+        ///IManager模板
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="tableComment"></param>

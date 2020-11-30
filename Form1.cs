@@ -61,11 +61,16 @@ namespace CodeGenerator
                     var pagedAndSortedResultRequestDtoTemplate = ContractTemplate.PagedAndSortedResultRequestDtoTemplate(tableName,
                         tableInfoList.Select(x => x.TableComment).FirstOrDefault());
 
+                    //todo 生成iServiceTemplate 模板
+                    var iServiceTemplate = ContractTemplate.IServiceTemplate(tableName,
+                        tableInfoList.Select(x => x.TableComment).FirstOrDefault(),
+                        tableInfoList.Select(x => x.DataType).FirstOrDefault());
+
                     // todo 生成IManager模板
                     var iManagerTemplate = DomainTemplate.IManagerTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
 
                     // todo 生成Manager模板
-                    var managerTemplate = DomainTemplate.ManagerTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+                    var managerTemplate = DomainTemplate.ManagerTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
                     // todo 生成IRepository模板
                     var iRepositoryTemplate = DomainTemplate.IRepositoryTemplate(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
@@ -76,10 +81,25 @@ namespace CodeGenerator
                     // todo 生成实体类模板
                     var entityTemplate = DomainTemplate.EntityTemplate(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
 
+                    // todo 生成Service模板
+
+                    var appService = ApplicationTemplate.ServiceTemplate(tableName,
+                        tableInfoList.Select(x => x.TableComment).FirstOrDefault(),
+                        tableInfoList.Select(x => x.DataType).FirstOrDefault());
+
+                    // todo 生成autoMapperTemplate模板
+
+                    var autoMapperTemplate = ApplicationTemplate.AutoMapperTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+
+                    //保存Application文件
+                    SaveFiles($"Application\\{tableName}s\\", $"{tableName}AppService.cs", appService);
+                    SaveFiles($"Application\\{tableName}s\\", $"{tableName}ApplicationAutoMapperProfile.cs", autoMapperTemplate);
+
                     //保存Contracts文件
                     SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"CreateUpdate{tableName}Dto.cs", createUpdateDtoTemplate);
                     SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"{tableName}Dto.cs", dtoTemplate);
                     SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"{tableName}PagedAndSortedResultRequestDto.cs", pagedAndSortedResultRequestDtoTemplate);
+                    SaveFiles($"Contracts\\{tableName}s\\", $"I{tableName}AppService.cs", iServiceTemplate);
 
                     //保存Domain文件
                     SaveFiles($"Domain\\{tableName}s\\DomainService\\", $"I{tableName}Manager.cs", iManagerTemplate);
@@ -206,7 +226,7 @@ namespace CodeGenerator
                 Directory.CreateDirectory(path + filePath);
             }
             var fileStream = new FileStream(path + filePath + fileName, FileMode.Create);
-            var data = System.Text.Encoding.Default.GetBytes(template);
+            var data = Encoding.Default.GetBytes(template);
             fileStream.Write(data, 0, data.Length);
             fileStream.Flush();
         }
