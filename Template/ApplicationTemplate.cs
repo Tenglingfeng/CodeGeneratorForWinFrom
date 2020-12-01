@@ -13,18 +13,19 @@ namespace CodeGenerator.Template
         ///  <param name="tableName"></param>
         ///  <param name="tableComment"></param>
         ///  <param name="dataTpe"></param>
+        ///  <param name="projectName"></param>
         ///  <returns></returns>
-        public static string ServiceTemplate(string tableName, string tableComment, string dataTpe)
+        public static string ServiceTemplate(string tableName, string tableComment, string dataTpe, string projectName)
         {
             var first = tableName.Substring(0, 1).ToLower();
             var end = tableName.Substring(1);
             var sb = new StringBuilder();
-            sb.AppendLine("using System;");
-            sb.AppendLine($"using {tableName}.Repository;");
-            sb.AppendLine($"using {tableName}.Manager;");
-            sb.AppendLine($"using {tableName}.Dto;");
-            sb.AppendLine("using System.Text;\r\n");
-            sb.AppendLine($"namespace {tableName}s");
+            sb.AppendLine($"using Benchint.Abp.Application.Services;");
+            sb.AppendLine($"using Benchint.{projectName}.{tableName}s.Repository;");
+            sb.AppendLine($"using Benchint.{projectName}.{tableName}s.DomainService;");
+            sb.AppendLine($"using Benchint.{projectName}.{tableName}s.Dto;");
+            sb.AppendLine("using System.Text;\r\n\r\n");
+            sb.AppendLine($"namespace Benchint.{projectName}.{tableName}s");
             sb.AppendLine("    {\r\n");
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 应用服务实现: {tableComment} ");
@@ -41,20 +42,21 @@ namespace CodeGenerator.Template
             return sb.ToString();
         }
 
-        /// <summary>
-        ///AutoMapper模板
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="tableComment"></param>
-        /// <returns></returns>
-        public static string AutoMapperTemplate(string tableName, string tableComment)
+        ///  <summary>
+        /// AutoMapper模板
+        ///  </summary>
+        ///  <param name="tableName"></param>
+        ///  <param name="tableComment"></param>
+        ///  <param name="projectName"></param>
+        ///  <returns></returns>
+        public static string AutoMapperTemplate(string tableName, string tableComment, string projectName)
         {
             var sb = new StringBuilder();
 
             sb.AppendLine("using AutoMapper;");
-            sb.AppendLine("using System.Text;\r\n");
-            sb.AppendLine($"namespace {tableName}.Dto");
-            sb.AppendLine("    {\r\n");
+            sb.AppendLine($"using Benchint.{projectName}.{tableName}s.Dto;\r\n");
+            sb.AppendLine($"namespace Benchint.{projectName}.{tableName}s");
+            sb.AppendLine("    {\r\n\r\n");
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 数据模型: {tableComment} ");
             sb.AppendLine($"            /// </summary>");

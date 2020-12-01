@@ -37,6 +37,11 @@ namespace CodeGenerator
             // {
             try
             {
+                if (string.IsNullOrWhiteSpace(ProjectName.Text))
+                {
+                    MessageBox.Show(@"请输入项目名称如:Test");
+                    return;
+                }
                 EnableButton(false);
 
                 var tables = GetSelectedTableNames();
@@ -51,45 +56,45 @@ namespace CodeGenerator
 
                     // todo 生成CreateUpdateDto模板
                     var createUpdateDtoTemplate = ContractTemplate.CreateUpdateDtoTemplate(tableInfoList, tableName,
-                        tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+                        tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
                     // todo 生成Dto模板
                     var dtoTemplate = ContractTemplate.DtoTemplate(tableInfoList, tableName,
-                        tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+                        tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
                     // todo 生成pagedAndSortedResultRequestDto模板
                     var pagedAndSortedResultRequestDtoTemplate = ContractTemplate.PagedAndSortedResultRequestDtoTemplate(tableName,
-                        tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+                        tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
                     //todo 生成iServiceTemplate 模板
                     var iServiceTemplate = ContractTemplate.IServiceTemplate(tableName,
                         tableInfoList.Select(x => x.TableComment).FirstOrDefault(),
-                        tableInfoList.Select(x => x.DataType).FirstOrDefault());
+                        tableInfoList.Select(x => x.DataType).FirstOrDefault(), ProjectName.Text);
 
                     // todo 生成IManager模板
-                    var iManagerTemplate = DomainTemplate.IManagerTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+                    var iManagerTemplate = DomainTemplate.IManagerTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
                     // todo 生成Manager模板
                     var managerTemplate = DomainTemplate.ManagerTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
                     // todo 生成IRepository模板
-                    var iRepositoryTemplate = DomainTemplate.IRepositoryTemplate(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+                    var iRepositoryTemplate = DomainTemplate.IRepositoryTemplate(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
                     // todo 生成Repository模板
-                    var repositoryTemplate = EntityFrameworkCoreTemplate.RepositoryTemplate(GetDbName(), tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+                    var repositoryTemplate = EntityFrameworkCoreTemplate.RepositoryTemplate(GetDbName(), tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text, tableInfoList.Select(x => x.DataType).FirstOrDefault());
 
                     // todo 生成实体类模板
-                    var entityTemplate = DomainTemplate.EntityTemplate(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+                    var entityTemplate = DomainTemplate.EntityTemplate(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
                     // todo 生成Service模板
 
                     var appService = ApplicationTemplate.ServiceTemplate(tableName,
                         tableInfoList.Select(x => x.TableComment).FirstOrDefault(),
-                        tableInfoList.Select(x => x.DataType).FirstOrDefault());
+                        tableInfoList.Select(x => x.DataType).FirstOrDefault(), ProjectName.Text);
 
                     // todo 生成autoMapperTemplate模板
 
-                    var autoMapperTemplate = ApplicationTemplate.AutoMapperTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault());
+                    var autoMapperTemplate = ApplicationTemplate.AutoMapperTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
                     //保存Application文件
                     SaveFiles($"Application\\{tableName}s\\", $"{tableName}AppService.cs", appService);

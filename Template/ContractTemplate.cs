@@ -7,14 +7,15 @@ namespace CodeGenerator.Template
 {
     public static class ContractTemplate
     {
-        /// <summary>
-        ///CreateUpdateDto模板
-        /// </summary>
-        /// <param name="tableInfoList"></param>
-        /// <param name="tableName"></param>
-        /// <param name="tableComment"></param>
-        /// <returns></returns>
-        public static string CreateUpdateDtoTemplate(List<InformationSchema> tableInfoList, string tableName, string tableComment)
+        ///  <summary>
+        /// CreateUpdateDto模板
+        ///  </summary>
+        ///  <param name="tableInfoList"></param>
+        ///  <param name="tableName"></param>
+        ///  <param name="tableComment"></param>
+        ///  <param name="projectName"></param>
+        ///  <returns></returns>
+        public static string CreateUpdateDtoTemplate(List<InformationSchema> tableInfoList, string tableName, string tableComment, string projectName)
         {
             if (tableInfoList.Count <= 0)
             {
@@ -24,8 +25,8 @@ namespace CodeGenerator.Template
             var getSet = " { get; set; } ";
             sb.AppendLine("using System;");
             sb.AppendLine("using System.ComponentModel.DataAnnotations;");
-            sb.AppendLine("using System.Text;\r\n");
-            sb.AppendLine($"namespace {tableName}.Dto");
+            sb.AppendLine($"using Volo.Abp.Application.Dtos;\r\n\r\n");
+            sb.AppendLine($"namespace Benchint.{projectName}.{tableName}s.Dto");
             sb.AppendLine("    {\r\n");
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 数据模型: 新增/修改{tableComment} ");
@@ -60,14 +61,15 @@ namespace CodeGenerator.Template
             return sb.ToString();
         }
 
-        /// <summary>
-        ///Dto模板
-        /// </summary>
-        /// <param name="tableInfoList"></param>
-        /// <param name="tableName"></param>
-        /// <param name="tableComment"></param>
-        /// <returns></returns>
-        public static string DtoTemplate(List<InformationSchema> tableInfoList, string tableName, string tableComment)
+        ///  <summary>
+        /// Dto模板
+        ///  </summary>
+        ///  <param name="tableInfoList"></param>
+        ///  <param name="tableName"></param>
+        ///  <param name="tableComment"></param>
+        ///  <param name="projectName"></param>
+        ///  <returns></returns>
+        public static string DtoTemplate(List<InformationSchema> tableInfoList, string tableName, string tableComment, string projectName)
         {
             if (tableInfoList.Count <= 0)
             {
@@ -77,8 +79,8 @@ namespace CodeGenerator.Template
             var getSet = " { get; set; } ";
             sb.AppendLine("using System;");
             sb.AppendLine("using System.ComponentModel.DataAnnotations;");
-            sb.AppendLine("using System.Text;\r\n");
-            sb.AppendLine($"namespace {tableName}.Dto");
+            sb.AppendLine($"using Volo.Abp.Application.Dtos;\r\n");
+            sb.AppendLine($"namespace Benchint.{projectName}.{tableName}s.Dto");
             sb.AppendLine("    {\r\n");
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 数据模型: {tableComment} ");
@@ -113,18 +115,19 @@ namespace CodeGenerator.Template
             return sb.ToString();
         }
 
-        /// <summary>
-        ///PagedAndSortedResultRequestDto模板
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="tableComment"></param>
-        /// <returns></returns>
-        public static string PagedAndSortedResultRequestDtoTemplate(string tableName, string tableComment)
+        ///  <summary>
+        /// PagedAndSortedResultRequestDto模板
+        ///  </summary>
+        ///  <param name="tableName"></param>
+        ///  <param name="tableComment"></param>
+        ///  <param name="projectName"></param>
+        ///  <returns></returns>
+        public static string PagedAndSortedResultRequestDtoTemplate(string tableName, string tableComment, string projectName)
         {
             var sb = new StringBuilder();
             sb.AppendLine("using System;");
-            sb.AppendLine("using System.Text;\r\n");
-            sb.AppendLine($"namespace {tableName}.Dto");
+            sb.AppendLine("using Volo.Abp.Application.Dtos;\r\n");
+            sb.AppendLine($"namespace Benchint.{projectName}.{tableName}s.Dto");
             sb.AppendLine("    {\r\n");
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 分页排序模型: {tableComment} ");
@@ -149,19 +152,19 @@ namespace CodeGenerator.Template
         ///  <param name="tableName"></param>
         ///  <param name="tableComment"></param>
         ///  <param name="dataType"></param>
+        ///  <param name="projectName"></param>
         ///  <returns></returns>
-        public static string IServiceTemplate(string tableName, string tableComment, string dataType)
+        public static string IServiceTemplate(string tableName, string tableComment, string dataType, string projectName)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("using System;");
-            sb.AppendLine("using System.Text;\r\n");
-            sb.AppendLine($"using {tableName}.Dto;");
-            sb.AppendLine($"namespace {tableName}s");
+            sb.AppendLine("using Benchint.Abp.Application.Services;");
+            sb.AppendLine($"using Benchint.{projectName}.{tableName}s.Dto;\r\n\r\n\r\n");
+            sb.AppendLine($"namespace Benchint.{projectName}.{tableName}s");
             sb.AppendLine("    {\r\n");
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 应用服务契约接口: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            sb.AppendLine($"             public interface IOrderAppService : IBenchintCrudAppService<{tableName}Dto, {dataType}, {tableName}PagedAndSortedResultRequestDto, CreateUpdate{tableName}Dto, CreateUpdate{tableName}Dto>");
+            sb.AppendLine($"             public interface I{tableName}AppService : IBenchintCrudAppService<{tableName}Dto, {dataType}, {tableName}PagedAndSortedResultRequestDto, CreateUpdate{tableName}Dto, CreateUpdate{tableName}Dto>");
             sb.AppendLine("            {\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
 
             sb.AppendLine("            }");
