@@ -230,7 +230,7 @@ namespace CodeGenerator
             {
                 Directory.CreateDirectory(path + filePath);
             }
-            var fileStream = new FileStream(path + filePath + fileName, FileMode.Create);
+            using var fileStream = new FileStream(path + filePath + fileName, FileMode.Create);
             var data = Encoding.Default.GetBytes(template);
             fileStream.Write(data, 0, data.Length);
             fileStream.Flush();
@@ -324,7 +324,7 @@ namespace CodeGenerator
         /// <returns></returns>
         private static string ReplaceString(string str)
         {
-            var result = "";
+            var result = str;
             if (!str.Contains("_") && !Regex.IsMatch(str, "[A-Z]"))  //&& Regex.IsMatch(str, "[a-z]")
             {
                 result = str[0].ToString().ToUpper() + str.Substring(1);
@@ -333,7 +333,7 @@ namespace CodeGenerator
             if (str.Contains("_"))
             {
                 var array = str.Split("_");
-                result = array.Aggregate(result, (current, s) => current + (s[0].ToString().ToUpper() + s.Substring(1)));
+                result = array.Aggregate(string.Empty, (current, s) => current + (s[0].ToString().ToUpper() + s.Substring(1)));
             }
 
             return result;

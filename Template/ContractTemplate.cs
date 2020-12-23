@@ -31,10 +31,14 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 数据模型: 新增/修改{tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            sb.AppendLine($"            public class CreateUpdate{tableName}Dto :EntityDto<{tableInfoList.FirstOrDefault()?.DataType}>");
+            sb.AppendLine($"            public class CreateUpdate{tableName}Dto :EntityDto<{tableInfoList.FirstOrDefault(x => x.IsPrimary)?.DataType}>");
             sb.AppendLine("            {");
-            foreach (var informationSchema in tableInfoList.Skip(1))
+            foreach (var informationSchema in tableInfoList)
             {
+                if (informationSchema.IsPrimary)
+                {
+                    continue;
+                }
                 sb.AppendLine($"              /// <summary>");
                 sb.AppendLine($"              ///  {informationSchema.ColumnComment} ");
                 sb.AppendLine($"              /// </summary>");
@@ -85,10 +89,15 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 数据模型: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            sb.AppendLine($"            public class {tableName}Dto :EntityDto<{tableInfoList.FirstOrDefault()?.DataType}>");
+            sb.AppendLine($"            public class {tableName}Dto :EntityDto<{tableInfoList.FirstOrDefault(x => x.IsPrimary)?.DataType}>");
             sb.AppendLine("            {");
-            foreach (var informationSchema in tableInfoList.Skip(1))
+            foreach (var informationSchema in tableInfoList)
             {
+                if (informationSchema.IsPrimary)
+                {
+                    continue;
+                }
+
                 sb.AppendLine($"              /// <summary>");
                 sb.AppendLine($"              ///  {informationSchema.ColumnComment} ");
                 sb.AppendLine($"              /// </summary>");
@@ -97,7 +106,7 @@ namespace CodeGenerator.Template
                     sb.AppendLine($"              [Required(ErrorMessage = \"{informationSchema.ColumnComment}不能为空\")]");
                 }
 
-                if (!string.IsNullOrEmpty(informationSchema.CharacterMaximumLength) && informationSchema.DataType.Equals("string"))
+                if (!string.IsNullOrEmpty(informationSchema.CharacterMaximumLength) && informationSchema.DataType.Equals("string") && Convert.ToInt64( informationSchema.CharacterMaximumLength )<= int.MaxValue)
                 {
                     sb.AppendLine(string.Format("              [StringLength( {0}, ErrorMessage = \"{1}输入过长，不能超过{0}位\" )]", informationSchema.CharacterMaximumLength, informationSchema.ColumnComment));
                 }

@@ -8,6 +8,11 @@ namespace CodeGenerator
     public class InformationSchema
     {
         /// <summary>
+        /// 是否主键
+        /// </summary>
+        public bool IsPrimary { get; set; }
+
+        /// <summary>
         /// 列名
         /// </summary>
         public string ColumnName { get; set; }

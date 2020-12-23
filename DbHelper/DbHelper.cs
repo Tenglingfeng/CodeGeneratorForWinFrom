@@ -32,6 +32,7 @@ namespace CodeGenerator.DbHelper
             using IDbConnection conn = new MySqlConnection(connString);
             var sql = $@"
                                 SELECT
+	                                `information_schema`.`COLUMNS`.`COLUMN_KEY`,
 	                                `information_schema`.`COLUMNS`.`COLUMN_NAME`,
 	                                `information_schema`.`COLUMNS`.`DATA_TYPE`,
 	                                `information_schema`.`COLUMNS`.`COLUMN_COMMENT`,
@@ -41,6 +42,7 @@ namespace CodeGenerator.DbHelper
 	                                `information_schema`.`COLUMNS`
                                 WHERE
                                 table_name = '{tableName}'
+                                order by ORDINAL_POSITION
                             ";
             var sql2 = $@"SELECT
 	                                information_schema.`TABLES`.TABLE_COMMENT
@@ -56,6 +58,7 @@ namespace CodeGenerator.DbHelper
             {
                 var tableInfo = new InformationSchema()
                 {
+                    IsPrimary = (reader["COLUMN_KEY"].ToString().Contains("PRI", StringComparison.CurrentCultureIgnoreCase)),
                     ColumnName = (reader["COLUMN_NAME"].ToString()),
                     DataType = (reader["DATA_TYPE"].ToString()),
                     ColumnComment = reader["COLUMN_COMMENT"].ToString(),
