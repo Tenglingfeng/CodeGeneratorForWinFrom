@@ -50,7 +50,7 @@ namespace CodeGenerator
                 {
                     var tableName = ReplaceString(table);
                     //获取表结构信息
-                    var tableInfoList = DbHelper.DbHelper.GetInformationSchema(connString.Text, table);
+                    var tableInfoList = DbHelper.DbHelper.GetInformationSchema(connString.Text, table, GetDbName());
                     //替换表字段和表类型
                     tableInfoList.ForEach(t => { t.ColumnName = ReplaceString(t.ColumnName); t.DataType = GetClrType(t.DataType, t.IsNullable); });
 

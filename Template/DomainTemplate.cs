@@ -30,7 +30,7 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 实体类信息: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            sb.AppendLine($"            public class {tableName} :Entity<{tableInfoList.FirstOrDefault()?.DataType}>");
+            sb.AppendLine($"            public class {tableName} :FullAuditedAggregateRoot<{tableInfoList.FirstOrDefault()?.DataType}>");
             sb.AppendLine("            {");
             foreach (var informationSchema in tableInfoList)
             {

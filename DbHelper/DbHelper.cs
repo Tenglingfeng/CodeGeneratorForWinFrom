@@ -27,7 +27,7 @@ namespace CodeGenerator.DbHelper
         /// <param name="connString"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static List<InformationSchema> GetInformationSchema(string connString, string tableName)
+        public static List<InformationSchema> GetInformationSchema(string connString, string tableName, string tableSchema)
         {
             using IDbConnection conn = new MySqlConnection(connString);
             var sql = $@"
@@ -42,15 +42,18 @@ namespace CodeGenerator.DbHelper
 	                                `information_schema`.`COLUMNS`
                                 WHERE
                                 table_name = '{tableName}'
-                                order by ORDINAL_POSITION
+	                            AND
+	                            TABLE_SCHEMA ='{tableSchema}'
                             ";
             var sql2 = $@"SELECT
 	                                information_schema.`TABLES`.TABLE_COMMENT
                                 FROM
 	                                `information_schema`.`TABLES`
                                 WHERE
-	                                table_name = '{tableName}'";
-
+	                                table_name = '{tableName}'
+                                AND
+	                            TABLE_SCHEMA ='{tableSchema}'
+                              ";
             var tableInfoList = new List<InformationSchema>();
             var reader = conn.ExecuteReader(sql);
 
