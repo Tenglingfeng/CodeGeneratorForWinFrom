@@ -36,7 +36,7 @@ namespace CodeGenerator.Template
             sb.AppendLine($"                public {tableName}AppService(I{tableName}Repository repository, I{tableName}Manager {first + end}Manager) : base(repository)");
             sb.AppendLine("                  {");
             sb.AppendLine($"                       _{first + end}Manager = {first + end}Manager;");
-            sb.AppendLine("                  }\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
+            sb.AppendLine("                  }");
             sb.AppendLine("            }");
             sb.AppendLine("    }");
             return sb.ToString();
@@ -67,7 +67,7 @@ namespace CodeGenerator.Template
             sb.AppendLine($"                              CreateMap<CreateUpdate{tableName}Dto, {tableName}>();");
             sb.AppendLine($"                              CreateMap<{tableName}, CreateUpdate{tableName}Dto>();");
             sb.AppendLine($"                              CreateMap<{tableName}Dto, {tableName}>();");
-            sb.AppendLine($"                              CreateMap<{tableName}, {tableName}Dto>();\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
+            sb.AppendLine($"                              CreateMap<{tableName}, {tableName}Dto>();");
             sb.AppendLine("                         }");
             sb.AppendLine("            }");
             sb.AppendLine("    }");

@@ -106,7 +106,7 @@ namespace CodeGenerator.Template
                     sb.AppendLine($"              [Required(ErrorMessage = \"{informationSchema.ColumnComment}不能为空\")]");
                 }
 
-                if (!string.IsNullOrEmpty(informationSchema.CharacterMaximumLength) && informationSchema.DataType.Equals("string") && Convert.ToInt64( informationSchema.CharacterMaximumLength )<= int.MaxValue)
+                if (!string.IsNullOrEmpty(informationSchema.CharacterMaximumLength) && informationSchema.DataType.Equals("string") && Convert.ToInt64(informationSchema.CharacterMaximumLength) <= int.MaxValue)
                 {
                     sb.AppendLine(string.Format("              [StringLength( {0}, ErrorMessage = \"{1}输入过长，不能超过{0}位\" )]", informationSchema.CharacterMaximumLength, informationSchema.ColumnComment));
                 }
@@ -149,7 +149,7 @@ namespace CodeGenerator.Template
             sb.AppendLine("                       {");
             sb.AppendLine($"                          Sorting = \"ReferenceNo Asc\";");
             sb.AppendLine("                       }");
-            sb.AppendLine("                   }\r\n\r\n\r\n\r\n");
+            sb.AppendLine("                   }");
             sb.AppendLine("            }");
             sb.AppendLine("    }");
             return sb.ToString();
@@ -174,7 +174,7 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// 应用服务契约接口: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
             sb.AppendLine($"             public interface I{tableName}AppService : IBenchintCrudAppService<{tableName}Dto, {dataType}, {tableName}PagedAndSortedResultRequestDto, CreateUpdate{tableName}Dto, CreateUpdate{tableName}Dto>");
-            sb.AppendLine("            {\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
+            sb.AppendLine("            {");
 
             sb.AppendLine("            }");
             sb.AppendLine("    }");

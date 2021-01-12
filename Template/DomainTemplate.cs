@@ -73,7 +73,7 @@ namespace CodeGenerator.Template
             sb.AppendLine($"                public {tableName}Manager(I{tableName}Repository repository)");
             sb.AppendLine("                  {");
             sb.AppendLine($"                       _{first + end}Repository = repository;");
-            sb.AppendLine("                  }\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
+            sb.AppendLine("                  }");
             sb.AppendLine("            }");
             sb.AppendLine("    }");
             return sb.ToString();
@@ -96,7 +96,7 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// 领域服务接口: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
             sb.AppendLine($"            public interface I{tableName}Manager : IDomainService");
-            sb.AppendLine("            {\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
+            sb.AppendLine("            {");
             sb.AppendLine("            }");
             sb.AppendLine("    }");
             return sb.ToString();
@@ -120,7 +120,7 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// 仓储接口: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
             sb.AppendLine($"            public interface I{tableName}Repository : IRepository<{tableName}, {tableInfoList.Select(x => x.DataType).FirstOrDefault()}>");
-            sb.AppendLine("            {\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
+            sb.AppendLine("            {");
             sb.AppendLine("            }");
             sb.AppendLine("    }");
             return sb.ToString();

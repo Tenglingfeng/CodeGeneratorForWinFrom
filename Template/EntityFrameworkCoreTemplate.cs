@@ -35,7 +35,7 @@ namespace CodeGenerator.Template
             sb.AppendLine($"                    public {tableName}Repository(IDbContextProvider<{dbName}Context> dbContextProvider) : base(dbContextProvider)");
             sb.AppendLine("                     {");
             sb.AppendLine($"                             _{dbName.ToLower()}ContextProvider = dbContextProvider;");
-            sb.AppendLine("                     }\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
+            sb.AppendLine("                     }");
             sb.AppendLine("            }");
             sb.AppendLine("    }");
             return sb.ToString();
