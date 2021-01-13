@@ -59,6 +59,12 @@ namespace CodeGenerator.DbHelper
 
             while (reader.Read())
             {
+                var filterString = reader["COLUMN_NAME"].ToString();
+                if (filterString == "extraproperties" || filterString == "concurrencystamp" || filterString == "isdeleted" || filterString == "deleterid" || filterString == "deletiontime"
+                    || filterString == "lastmodifierid" || filterString == "lastmodificationtime" || filterString == "creatorid" || filterString == "creationtime")
+                {
+                    continue;
+                }
                 var tableInfo = new InformationSchema()
                 {
                     IsPrimary = (reader["COLUMN_KEY"].ToString().Contains("PRI", StringComparison.CurrentCultureIgnoreCase)),

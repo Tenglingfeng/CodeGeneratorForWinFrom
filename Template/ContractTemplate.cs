@@ -175,7 +175,18 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// </summary>");
             sb.AppendLine($"             public interface I{tableName}AppService : IBenchintCrudAppService<{tableName}Dto, {dataType}, {tableName}PagedAndSortedResultRequestDto, CreateUpdate{tableName}Dto, CreateUpdate{tableName}Dto>");
             sb.AppendLine("            {");
-
+            sb.AppendLine("               /// <summary>");
+            sb.AppendLine($"               ///保存 {tableComment}");
+            sb.AppendLine("               /// </summary>");
+            sb.AppendLine("               /// <param name=\"dto\"></param>");
+            sb.AppendLine("               /// <returns></returns>");
+            sb.AppendLine($"               Task<bool> SaveAsync(CreateUpdate{tableName}Dto dto);\r\n\r\n");
+            sb.AppendLine("               /// <summary>");
+            sb.AppendLine($"               ///保存 {tableComment} 列表");
+            sb.AppendLine("               /// </summary>");
+            sb.AppendLine("               /// <param name=\"dtos\"></param>");
+            sb.AppendLine("               /// <returns></returns>");
+            sb.AppendLine($"                Task<bool> SaveBatchAsync(IEnumerable<CreateUpdate{tableName}Dto> dtos);");
             sb.AppendLine("            }");
             sb.AppendLine("    }");
             return sb.ToString();

@@ -30,7 +30,7 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 实体类信息: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            sb.AppendLine($"            public class {tableName} :FullAuditedAggregateRoot<{tableInfoList.FirstOrDefault()?.DataType}>");
+            sb.AppendLine($"            public class {tableName} :AuditedAggregateRoot<{tableInfoList.FirstOrDefault()?.DataType}>");
             sb.AppendLine("            {");
             foreach (var informationSchema in tableInfoList)
             {
@@ -119,7 +119,14 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 仓储接口: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            sb.AppendLine($"            public interface I{tableName}Repository : IRepository<{tableName}, {tableInfoList.Select(x => x.DataType).FirstOrDefault()}>");
+            if (tableInfoList.Select(x => x.ColumnName).Contains("DataSource"))
+            {
+                sb.AppendLine($"            public interface I{tableName}Repository : IDetailRepository<{tableName}, {tableInfoList.Select(x => x.DataType).FirstOrDefault()}>");
+            }
+            else
+            {
+                sb.AppendLine($"            public interface I{tableName}Repository : IRepository<{tableName}, {tableInfoList.Select(x => x.DataType).FirstOrDefault()}>");
+            }
             sb.AppendLine("            {");
             sb.AppendLine("            }");
             sb.AppendLine("    }");
