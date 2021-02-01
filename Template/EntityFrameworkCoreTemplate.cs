@@ -36,17 +36,6 @@ namespace CodeGenerator.Template
             sb.AppendLine("                     {");
             sb.AppendLine($"                             _{dbName.ToLower()}ContextProvider = dbContextProvider;");
             sb.AppendLine("                     }");
-            //sb.AppendLine("               /// <summary>");
-            //sb.AppendLine($"               ///查询 {tableComment} 明细");
-            //sb.AppendLine("               /// </summary>");
-            //sb.AppendLine("               /// <param name=\"entities\"></param>");
-            //sb.AppendLine("               /// <returns></returns>");
-            //sb.AppendLine($"               public async Task<IEnumerable<{tableName}>> QueryDetailsAsync(IEnumerable<{tableName}> entities)");
-            //sb.AppendLine("                  {");
-            //sb.AppendLine($"                     if (entities == null || !entities.Any()) return entities;");
-            //sb.AppendLine($"                     var ids = entities.Select(x => x.Id);");
-            //sb.AppendLine($"                     return entities;");
-            //sb.AppendLine("                  }");
             sb.AppendLine("            }");
             sb.AppendLine("    }");
             return sb.ToString();
