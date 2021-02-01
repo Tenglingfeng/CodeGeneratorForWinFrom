@@ -34,7 +34,7 @@ namespace CodeGenerator.Template
             sb.AppendLine("            {");
             foreach (var informationSchema in tableInfoList)
             {
-                if (informationSchema.IsPrimary)
+                if (informationSchema.IsPrimary || informationSchema.ColumnName.ToUpper().Equals("IsDeleted".ToUpper()))
                 {
                     continue;
                 }
@@ -119,14 +119,15 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 仓储接口: {tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            if (tableInfoList.Select(x => x.ColumnName).Contains("DataSource"))
-            {
-                sb.AppendLine($"            public interface I{tableName}Repository : IDetailRepository<{tableName}, {tableInfoList.Select(x => x.DataType).FirstOrDefault()}>");
-            }
-            else
-            {
-                sb.AppendLine($"            public interface I{tableName}Repository : IRepository<{tableName}, {tableInfoList.Select(x => x.DataType).FirstOrDefault()}>");
-            }
+            //if (tableInfoList.Select(x => x.ColumnName).Contains("DataSource"))
+            //{
+            //    sb.AppendLine($"            public interface I{tableName}Repository : IDetailRepository<{tableName}, {tableInfoList.Select(x => x.DataType).FirstOrDefault()}>");
+            //}
+            //else
+            //{
+            //}
+            sb.AppendLine($"            public interface I{tableName}Repository : IRepository<{tableName}, {tableInfoList.Select(x => x.DataType).FirstOrDefault()}>");
+
             sb.AppendLine("            {");
             sb.AppendLine("            }");
             sb.AppendLine("    }");

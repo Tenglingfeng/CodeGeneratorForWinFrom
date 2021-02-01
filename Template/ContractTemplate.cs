@@ -31,33 +31,73 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// <summary>");
             sb.AppendLine($"            /// 数据模型: 新增/修改{tableComment} ");
             sb.AppendLine($"            /// </summary>");
-            sb.AppendLine($"            public class CreateUpdate{tableName}Dto :EntityDto<{tableInfoList.FirstOrDefault(x => x.IsPrimary)?.DataType}>");
+            // sb.AppendLine($"            public class CreateUpdate{tableName}Dto :EntityDto<{tableInfoList.FirstOrDefault(x => x.IsPrimary)?.DataType}>");
+            if (tableInfoList.Select(x => x.ColumnName).ToList().Contains("DataSource"))
+            {
+                sb.AppendLine($"            public class CreateUpdate{tableName}Dto :EntityDto,IHasDataSourceDto,IHasResidenterDto,IHasDeleteFlagDto");
+            }
+            else
+            {
+                sb.AppendLine($"            public class CreateUpdate{tableName}Dto :EntityDto");
+            }
+
             sb.AppendLine("            {");
             foreach (var informationSchema in tableInfoList)
             {
-                if (informationSchema.IsPrimary)
+                if (informationSchema.IsPrimary || informationSchema.ColumnName.Equals("IdcardNumber")
+                                               || informationSchema.ColumnName.Equals("IdcardType")
+                                               || informationSchema.ColumnName.Equals("Siteid"))
                 {
                     continue;
                 }
+
+                if (!sb.ToString().Contains("IHasResidenterDto"))
+                {
+                    if ((informationSchema.ColumnName.Contains("Id") && informationSchema.DataType == "long") || informationSchema.ColumnName.Equals("Isdeleted"))
+                    {
+                        continue;
+                    }
+                }
+
                 sb.AppendLine($"              /// <summary>");
                 sb.AppendLine($"              ///  {informationSchema.ColumnComment} ");
                 sb.AppendLine($"              /// </summary>");
                 if (!informationSchema.IsNullable)
                 {
-                    sb.AppendLine($"              [Required(ErrorMessage = \"{informationSchema.ColumnComment}不能为空\")]");
+                    sb.AppendLine($"              [Required(ErrorMessage = \"{informationSchema.ColumnComment} 不能为空\")]");
                 }
 
                 if (!string.IsNullOrEmpty(informationSchema.CharacterMaximumLength) && informationSchema.DataType.Equals("string"))
                 {
-                    sb.AppendLine(string.Format("              [StringLength( {0}, ErrorMessage = \"{1}输入过长，不能超过{0}位\" )]", informationSchema.CharacterMaximumLength, informationSchema.ColumnComment));
+                    sb.AppendLine(string.Format("              [StringLength( {0}, ErrorMessage = \"{1} 输入过长，不能超过{0}位\" )]", informationSchema.CharacterMaximumLength, informationSchema.ColumnComment));
                 }
 
-                if (informationSchema.DataType.Equals("int"))
+                //if (informationSchema.DataType.Equals("int"))
+                //{
+                //    sb.AppendLine(
+                //        $"              [Range(1, {int.MaxValue})]");
+                //}
+                var columnName = informationSchema.ColumnName;
+                if (columnName.Equals("ResidenterId"))
                 {
-                    sb.AppendLine(
-                        $"              [Range(1, {int.MaxValue})]");
+                    columnName = "UserHealthDocNo";
+                    informationSchema.DataType = "string";
                 }
-                sb.AppendLine($"              public  {informationSchema.DataType}  {informationSchema.ColumnName} {getSet}");
+                else if (columnName.Equals("OrganizationId"))
+                {
+                    columnName = "OrganizationNo";
+                    informationSchema.DataType = "string";
+                }
+                else if (columnName.Equals("Isdeleted"))
+                {
+                    columnName = "IsDeleted";
+                }
+                else if (informationSchema.ColumnComment.Contains("二进制"))
+                {
+                    informationSchema.DataType = "string[]";
+                }
+
+                sb.AppendLine($"              public  {informationSchema.DataType}  {columnName} {getSet}");
                 sb.AppendLine();
             }
             sb.AppendLine("            }");
@@ -175,12 +215,12 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// </summary>");
             sb.AppendLine($"             public interface I{tableName}AppService : IBenchintCrudAppService<{tableName}Dto, {dataType}, {tableName}PagedAndSortedResultRequestDto, CreateUpdate{tableName}Dto, CreateUpdate{tableName}Dto>");
             sb.AppendLine("            {");
-            sb.AppendLine("               /// <summary>");
-            sb.AppendLine($"               ///保存 {tableComment}");
-            sb.AppendLine("               /// </summary>");
-            sb.AppendLine("               /// <param name=\"dto\"></param>");
-            sb.AppendLine("               /// <returns></returns>");
-            sb.AppendLine($"               Task<bool> SaveAsync(CreateUpdate{tableName}Dto dto);\r\n\r\n");
+            //sb.AppendLine("               /// <summary>");
+            //sb.AppendLine($"               ///保存 {tableComment}");
+            //sb.AppendLine("               /// </summary>");
+            //sb.AppendLine("               /// <param name=\"dto\"></param>");
+            //sb.AppendLine("               /// <returns></returns>");
+            //sb.AppendLine($"               Task<bool> SaveAsync(CreateUpdate{tableName}Dto dto);\r\n\r\n");
             sb.AppendLine("               /// <summary>");
             sb.AppendLine($"               ///保存 {tableComment} 列表");
             sb.AppendLine("               /// </summary>");
