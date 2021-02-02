@@ -35,9 +35,14 @@ namespace CodeGenerator.Template
             sb.AppendLine("            {");
             foreach (var informationSchema in tableInfoList)
             {
+                if (informationSchema.IsPrimary)
+                {
+                    continue;
+                }
                 sb.AppendLine($"              /// <summary>");
                 sb.AppendLine($"              ///  {informationSchema.ColumnComment} ");
                 sb.AppendLine($"              /// </summary>");
+
                 if (!informationSchema.IsNullable)
                 {
                     sb.AppendLine($"              [Required(ErrorMessage = \"{informationSchema.ColumnComment} 不能为空\")]");
@@ -92,15 +97,14 @@ namespace CodeGenerator.Template
                 sb.AppendLine($"              /// <summary>");
                 sb.AppendLine($"              ///  {informationSchema.ColumnComment} ");
                 sb.AppendLine($"              /// </summary>");
-                if (!informationSchema.IsNullable)
-                {
-                    sb.AppendLine($"              [Required(ErrorMessage = \"{informationSchema.ColumnComment}不能为空\")]");
-                }
-
-                if (!string.IsNullOrEmpty(informationSchema.CharacterMaximumLength) && informationSchema.DataType.Equals("string") && Convert.ToInt64(informationSchema.CharacterMaximumLength) <= int.MaxValue)
-                {
-                    sb.AppendLine(string.Format("              [StringLength( {0}, ErrorMessage = \"{1}  输入过长，不能超过{0}位\" )]", informationSchema.CharacterMaximumLength, informationSchema.ColumnComment));
-                }
+                //if (!informationSchema.IsNullable)
+                //{
+                //    sb.AppendLine($"              [Required(ErrorMessage = \"{informationSchema.ColumnComment}不能为空\")]");
+                //}
+                //if (!string.IsNullOrEmpty(informationSchema.CharacterMaximumLength) && informationSchema.DataType.Equals("string") && Convert.ToInt64(informationSchema.CharacterMaximumLength) <= int.MaxValue)
+                //{
+                //    sb.AppendLine(string.Format("              [StringLength( {0}, ErrorMessage = \"{1}  输入过长，不能超过{0}位\" )]", informationSchema.CharacterMaximumLength, informationSchema.ColumnComment));
+                //}
 
                 sb.AppendLine($"              public  {informationSchema.DataType}  {informationSchema.ColumnName} {getSet}");
                 sb.AppendLine();
