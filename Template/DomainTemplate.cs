@@ -32,8 +32,12 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// </summary>");
             sb.AppendLine($"            public class {tableName} :FullAuditedAggregateRoot<{tableInfoList.FirstOrDefault()?.DataType}>");
             sb.AppendLine("            {");
-            foreach (var informationSchema in tableInfoList.Take(1))
+            foreach (var informationSchema in tableInfoList)
             {
+                if (informationSchema.IsPrimary)
+                {
+                    continue;
+                }
                 sb.AppendLine($"              /// <summary>");
                 sb.AppendLine($"              ///  {informationSchema.ColumnComment} ");
                 sb.AppendLine($"              /// </summary>");

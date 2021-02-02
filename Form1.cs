@@ -101,8 +101,8 @@ namespace CodeGenerator
                     SaveFiles($"Application\\{tableName}s\\", $"{tableName}ApplicationAutoMapperProfile.cs", autoMapperTemplate);
 
                     //保存Contracts文件
-                    //SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"CreateUpdate{tableName}Dto.cs", createUpdateDtoTemplate);
-                    SaveFiles($"Contracts\\CreateUpdateDto\\", $"CreateUpdate{tableName}Dto.cs", createUpdateDtoTemplate);
+                    SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"CreateUpdate{tableName}Dto.cs", createUpdateDtoTemplate);
+                    //SaveFiles($"Contracts\\CreateUpdateDto\\", $"CreateUpdate{tableName}Dto.cs", createUpdateDtoTemplate);
                     SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"{tableName}Dto.cs", dtoTemplate);
                     SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"{tableName}PagedAndSortedResultRequestDto.cs", pagedAndSortedResultRequestDtoTemplate);
                     SaveFiles($"Contracts\\{tableName}s\\", $"I{tableName}AppService.cs", iServiceTemplate);
