@@ -96,25 +96,30 @@ namespace CodeGenerator
 
                     var autoMapperTemplate = ApplicationTemplate.AutoMapperTemplate(tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
-                    //保存Application文件
-                    SaveFiles($"Application\\{tableName}s\\", $"{tableName}AppService.cs", appService);
-                    SaveFiles($"Application\\{tableName}s\\", $"{tableName}ApplicationAutoMapperProfile.cs", autoMapperTemplate);
+                    var validatorTemplate = ValidationTemplate.ValidatorTemplate(tableInfoList, tableName, tableInfoList.Select(x => x.TableComment).FirstOrDefault(), ProjectName.Text);
 
-                    //保存Contracts文件
-                    //SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"CreateUpdate{tableName}Dto.cs", createUpdateDtoTemplate);
-                    SaveFiles($"Contracts\\CreateUpdateDto\\", $"CreateUpdate{tableName}Dto.cs", createUpdateDtoTemplate);
-                    SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"{tableName}Dto.cs", dtoTemplate);
-                    SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"{tableName}PagedAndSortedResultRequestDto.cs", pagedAndSortedResultRequestDtoTemplate);
-                    SaveFiles($"Contracts\\{tableName}s\\", $"I{tableName}AppService.cs", iServiceTemplate);
+                    SaveFiles($"Validations\\", $"{tableName}Validator.cs", validatorTemplate);
 
-                    //保存Domain文件
-                    SaveFiles($"Domain\\{tableName}s\\DomainService\\", $"I{tableName}Manager.cs", iManagerTemplate);
-                    SaveFiles($"Domain\\{tableName}s\\DomainService\\", $"{tableName}Manager.cs", managerTemplate);
-                    SaveFiles($"Domain\\{tableName}s\\Repository\\", $"I{tableName}Repository.cs", iRepositoryTemplate);
-                    SaveFiles($"Domain\\{tableName}s\\", $"{tableName}.cs", entityTemplate);
+                    ////保存Application文件
+                    //SaveFiles($"Application\\{tableName}s\\", $"{tableName}AppService.cs", appService);
+                    //SaveFiles($"Application\\{tableName}s\\", $"{tableName}ApplicationAutoMapperProfile.cs", autoMapperTemplate);
 
-                    //保存EntityFrameworkCore文件
-                    SaveFiles($"EntityFrameworkCore\\Repositories\\{tableName}s\\", $"{tableName}Repository.cs", repositoryTemplate);
+                    ////保存Contracts文件
+                    ////SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"CreateUpdate{tableName}Dto.cs", createUpdateDtoTemplate);
+                    //SaveFiles($"Contracts\\CreateUpdateDto\\", $"CreateUpdate{tableName}Dto.cs", createUpdateDtoTemplate);
+                    //SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"{tableName}Dto.cs", dtoTemplate);
+                    //SaveFiles($"Contracts\\{tableName}s\\Dto\\", $"{tableName}PagedAndSortedResultRequestDto.cs", pagedAndSortedResultRequestDtoTemplate);
+                    //SaveFiles($"Contracts\\{tableName}s\\", $"I{tableName}AppService.cs", iServiceTemplate);
+
+                    ////保存Domain文件
+                    //SaveFiles($"Domain\\{tableName}s\\DomainService\\", $"I{tableName}Manager.cs", iManagerTemplate);
+                    //SaveFiles($"Domain\\{tableName}s\\DomainService\\", $"{tableName}Manager.cs", managerTemplate);
+                    //SaveFiles($"Domain\\{tableName}s\\Repository\\", $"I{tableName}Repository.cs", iRepositoryTemplate);
+                    //SaveFiles($"Domain\\{tableName}s\\", $"{tableName}.cs", entityTemplate);
+                    //SaveFiles($"Domain\\Entities\\{tableName}s\\", $"{tableName}.cs", entityTemplate);
+
+                    ////保存EntityFrameworkCore文件
+                    //SaveFiles($"EntityFrameworkCore\\Repositories\\{tableName}s\\", $"{tableName}Repository.cs", repositoryTemplate);
                 }
             }
             catch (Exception exception)
