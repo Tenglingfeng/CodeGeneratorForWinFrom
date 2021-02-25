@@ -31,10 +31,8 @@ namespace CodeGenerator.Template
             sb.AppendLine($"            /// </summary>");
             sb.AppendLine($"            public class {tableName}Repository : EfCoreRepository<{dbName}Context,{tableName},{dataType}>,I{tableName}Repository");
             sb.AppendLine("            {\r\n");
-            sb.AppendLine($"                    private readonly IDbContextProvider<{dbName}Context> _{dbName.ToLower()}ContextProvider;\r\n\r\n");
             sb.AppendLine($"                    public {tableName}Repository(IDbContextProvider<{dbName}Context> dbContextProvider) : base(dbContextProvider)");
             sb.AppendLine("                     {");
-            sb.AppendLine($"                             _{dbName.ToLower()}ContextProvider = dbContextProvider;");
             sb.AppendLine("                     }");
             sb.AppendLine("            }");
             sb.AppendLine("    }");

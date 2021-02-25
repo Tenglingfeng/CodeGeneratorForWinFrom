@@ -17,8 +17,6 @@ namespace CodeGenerator.Template
         ///  <returns></returns>
         public static string ServiceTemplate(string tableName, string tableComment, string dataTpe, string projectName)
         {
-            var first = tableName.Substring(0, 1).ToLower();
-            var end = tableName.Substring(1);
             var sb = new StringBuilder();
             sb.AppendLine($"using Benchint.Abp.Application.Services;");
             sb.AppendLine($"using Benchint.{projectName}.{tableName}s.Repository;");
